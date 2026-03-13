@@ -1,0 +1,296 @@
+/* App.css */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Montserrat:wght@300;400;700&display=swap');
+
+* { box-sizing: border-box; }
+
+body, html {
+  margin: 0; padding: 0; width: 100%; height: 100%;
+  background-color: #050510; color: white;
+  font-family: 'Montserrat', sans-serif; overflow: hidden; 
+  user-select: none; /* Защита от выделения при свайпе */
+}
+
+.app-container {
+  position: relative; width: 100vw; height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; text-align: center;
+}
+
+/* Звездное небо */
+.stars {
+  position: absolute; top: 0; left: 0; width: 2px; height: 2px; background: transparent;
+  box-shadow: 10vw 20vh #fff, 20vw 80vh #fff, 30vw 10vh #fff, 40vw 60vh #fff, 
+    50vw 30vh #fff, 60vw 90vh #fff, 70vw 40vh #fff, 80vw 70vh #fff, 
+    90vw 20vh #fff, 15vw 50vh #fff, 85vw 85vh #fff, 45vw 15vh #fff,
+    25vw 35vh #fff, 75vw 55vh #fff, 65vw 15vh #fff, 5vw 95vh #fff;
+  animation: twinkle 4s infinite alternate; z-index: 0;
+}
+
+button {
+  padding: 15px 30px;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef);
+  color: #333; border: none; border-radius: 30px;
+  font-size: 1.2rem; font-weight: bold; cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s; z-index: 10;
+}
+button:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255, 154, 158, 0.8); }
+button:disabled { background: #555; color: #888; cursor: not-allowed; box-shadow: none; transform: none; }
+
+/* Плавный эффект затемнения при переходе */
+.fade-transition-overlay {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: #050510; z-index: 9999; pointer-events: none;
+  animation: softFade 1s ease-in-out forwards;
+}
+@keyframes softFade { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+
+/* --- Уровни 0, 1, 2, 3 --- */
+.start-screen { z-index: 10; animation: fadeIn 2s ease-in; }
+.start-screen h1 { font-family: 'Caveat', cursive; font-size: 4rem; margin-bottom: 2rem; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+.level-container { z-index: 10; display: flex; flex-direction: column; align-items: center; width: 100%; height: 100%; justify-content: center; }
+.hint-text { font-size: 1.2rem; margin-bottom: 40px; opacity: 0.8; animation: fadeIn 2s ease-in; z-index: 10; }
+.background-text-container { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); z-index: 1; font-family: 'Caveat', cursive; font-size: 2.5rem; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.5), 0 0 30px #ffb450; line-height: 1.3; white-space: nowrap; }
+.message-line { opacity: 0; }
+.background-text-container.show .line-1 { animation: fadeInText 1.5s forwards 1.5s; }
+.background-text-container.show .line-2 { animation: fadeInText 1.5s forwards 3s; }
+.background-text-container.show .line-3 { animation: fadeInText 1.5s forwards 4.5s; }
+.background-text-container.show .line-4 { animation: fadeInText 1.5s forwards 5.5s; }
+.background-text-container.show .line-5 { animation: fadeInText 1.5s forwards 6.5s; }
+.lantern-wrapper { position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 5; animation: sway 4s infinite ease-in-out alternate; }
+.lantern-wrapper.fly { animation: floatUp 8s ease-in forwards; cursor: default; }
+.lantern { width: 180px; height: 240px; background: rgba(200, 50, 50, 0.8); border-radius: 90px 90px 30px 30px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: background 1.5s, box-shadow 1.5s; }
+.lantern-wrapper.fly .lantern { background: rgba(255, 180, 80, 0.95); box-shadow: 0 0 50px #ffb450, inset 0 0 30px #fff; }
+.flame { width: 15px; height: 25px; background: transparent; border-radius: 50% 50% 20% 20%; margin-top: 5px; transition: background 1s, box-shadow 1s; }
+.lantern-wrapper.fly .flame { background: #ffcc00; box-shadow: 0 0 15px #ffcc00, 0 0 30px #ff6600; animation: flicker 0.2s infinite alternate; }
+.next-btn-container { position: absolute; bottom: 15%; animation: fadeIn 2s forwards; z-index: 10; }
+.wordle-container { display: flex; flex-direction: column; align-items: center; z-index: 10; animation: fadeIn 1s; }
+.wordle-grid { display: grid; grid-template-rows: repeat(6, 1fr); gap: 8px; margin-bottom: 20px; }
+.wordle-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.wordle-cell { width: 55px; height: 55px; border: 2px solid #555; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; text-transform: uppercase; background-color: transparent; color: white; transition: transform 0.6s, background-color 0.6s; transform-style: preserve-3d; }
+.wordle-cell.flip-correct { animation: flipCorrect 0.6s ease forwards; } .wordle-cell.flip-present { animation: flipPresent 0.6s ease forwards; } .wordle-cell.flip-absent { animation: flipAbsent 0.6s ease forwards; }
+.wordle-cell[data-pos="0"] { animation-delay: 0s; } .wordle-cell[data-pos="1"] { animation-delay: 0.2s; } .wordle-cell[data-pos="2"] { animation-delay: 0.4s; } .wordle-cell[data-pos="3"] { animation-delay: 0.6s; } .wordle-cell[data-pos="4"] { animation-delay: 0.8s; }
+.wordle-input { padding: 12px; font-size: 1.5rem; text-transform: uppercase; text-align: center; letter-spacing: 10px; border-radius: 8px; border: none; width: 300px; margin-bottom: 15px; outline: none; font-weight: bold; }
+.full-screen-celebration { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 5; pointer-events: none; }
+.success-message-full { animation: fadeIn 1.5s ease-in; margin-top: 20px; position: relative; z-index: 10; }
+.success-message-full h2 { font-family: 'Caveat', cursive; font-size: 3rem; color: #2ecc71; margin-bottom: 15px; text-shadow: 0 0 20px rgba(46,204,113,0.8), 0 0 40px #fff; }
+.full-screen-star { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #ffb450; border-radius: 50%; box-shadow: 0 0 10px #ffb450, 0 0 20px #ffcc00, 0 0 30px #fff; opacity: 0; animation: fullStarBurst 3s ease-out forwards; }
+.pinata-scene { display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; animation: fadeIn 1s ease-in; width: 100%; height: 100%; }
+.screen-shake { animation: bigShake 0.5s ease-in-out; }
+.pinata-title { font-family: 'Caveat', cursive; font-size: 3rem; margin-bottom: 20px; text-shadow: 0 0 15px #ff4500, 0 0 30px #ff0000; color: #fff8e7; }
+.rope { width: 6px; height: 120px; background: linear-gradient(to bottom, #8b0000, #ff0000); border-radius: 3px; margin-bottom: -15px; z-index: 1; }
+.pinata { font-size: 8rem; cursor: pointer; user-select: none; z-index: 2; transform-origin: top center; transition: filter 0.2s, transform 0.2s; animation: gentleSway 3s infinite ease-in-out alternate; filter: drop-shadow(0 0 15px rgba(255, 0, 0, 0.5)); }
+.pinata.hit { animation: pinataHit 0.2s ease-in-out; filter: drop-shadow(0 0 40px #ff4500) brightness(1.5) !important; }
+.damage-1 { filter: drop-shadow(0 0 30px #ff0000) brightness(1.2) hue-rotate(-10deg); } .damage-2 { filter: drop-shadow(0 0 50px #ff4500) brightness(1.4) hue-rotate(-20deg); transform: scale(0.95); } .damage-3 { filter: drop-shadow(0 0 80px #ffff00) brightness(1.8) hue-rotate(-30deg); transform: scale(0.9); animation: furiousShake 0.1s infinite; }
+.firework-particle { position: absolute; top: 40%; left: 50%; border-radius: 50%; opacity: 0; animation: fireworkExplosion 1.5s cubic-bezier(0.1, 0.8, 0.2, 1) forwards; }
+.falling-items-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 20; overflow: hidden; }
+.falling-item { position: absolute; top: -10%; font-size: 3rem; animation: fallDown linear forwards; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5)); }
+
+/* =========================================
+   УРОВЕНЬ 4: МАГИЧЕСКИЙ СВИТОК (ИСПРАВЛЕННЫЙ)
+   ========================================= */
+.scroll-container { 
+  display: flex; flex-direction: column; align-items: center; justify-content: center; 
+  width: 100%; height: 100%; z-index: 10; animation: fadeIn 1s ease-in; 
+}
+.magic-scroll { font-size: 9rem; margin-top: 30px; animation: dropScroll 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; filter: drop-shadow(0 0 40px #f1c40f) drop-shadow(0 0 20px #fff); z-index: 25; }
+.magic-scroll-wrapper { 
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; filter: drop-shadow(0 15px 35px rgba(255, 180, 80, 0.2)); 
+  transform-style: preserve-3d; transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); 
+  max-height: 100vh; /* Ограничиваем общую высоту */
+}
+.magic-scroll-wrapper[class*="step-"]:not(.step-5):active { transform: scale(0.97); }
+
+.scroll-handle { 
+  width: 250px; height: 25px; background: linear-gradient(to right, #6d4c41, #a1887f, #6d4c41); 
+  border-radius: 12px; position: relative; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); 
+  z-index: 15; flex-shrink: 0; /* Чтобы ручки не сжимались */
+}
+.scroll-handle::before, .scroll-handle::after { 
+  content: ''; position: absolute; top: -3px; width: 20px; height: 31px; 
+  background: radial-gradient(circle at center, #f1c40f, #d4af37); border-radius: 50%; 
+}
+.scroll-handle::before { left: -10px; } .scroll-handle::after { right: -10px; }
+.handle-top { transform: translateY(12px); } .handle-bottom { transform: translateY(-12px); }
+
+.scroll-paper { 
+  width: 230px; background: #fff8e7; 
+  transition: max-height 0.6s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.6s; 
+  max-height: 0px; overflow: hidden; z-index: 10; 
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.05); border-radius: 4px; 
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+
+.step-0 .scroll-paper { max-height: 0; } 
+.step-1 .scroll-paper { max-height: 100px; } .step-1 .handle-top { transform: translateY(0); } .step-1 .handle-bottom { transform: translateY(0); }
+.step-2 .scroll-paper { max-height: 250px; } .step-2 .magic-scroll-wrapper { transform: scale(1.05); } 
+.step-3 .scroll-paper { max-height: 400px; } .step-3 .scroll-handle { width: 300px; } .step-3 .scroll-paper { width: 280px; }
+.step-4 .scroll-paper { max-height: 600px; } .step-4 .magic-scroll-wrapper { transform: rotate(-1deg); }
+
+/* Финальный шаг свитка */
+.step-5 { cursor: default; width: 90vw; max-width: 600px; } 
+.step-5 .scroll-paper { 
+  max-height: 80vh; /* Ограничиваем высоту бумаги */
+  width: 100%; 
+  background: #fffdf5; 
+  overflow-y: auto; /* Добавляем прокрутку, если текст не влезает */
+} 
+.step-5 .scroll-handle { width: 100%; height: 30px; } 
+.step-5 .magic-scroll-wrapper { transform: scale(1); filter: drop-shadow(0 10px 40px rgba(255, 180, 80, 0.3)); }
+
+/* Текст внутри */
+.final-letter { 
+  padding: 30px 20px; text-align: center; font-family: 'Caveat', cursive; 
+  line-height: 1.3; transition: opacity 1s ease-in; 
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+}
+.final-letter h3 { font-size: 2.5rem; color: #d35400; margin-bottom: 20px; } 
+.final-letter p { font-size: 1.5rem; color: #2c3e50; margin: 5px 0; }
+.final-letter.hidden { opacity: 0; visibility: hidden; } 
+.final-letter.visible { opacity: 1; visibility: visible; }
+
+/* =========================================
+   УРОВЕНЬ 5: ФИНАЛ (ТЫСЯЧА ФОНАРИКОВ) 
+   ========================================= */
+
+.final-scene-container {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; z-index: 10;
+  background: transparent;
+  transition: background 5s ease-in-out;
+}
+
+/* Когда летят фонарики, небо слегка светлеет и наливается золотом */
+.final-scene-container.light-up {
+  background: radial-gradient(circle at bottom, rgba(255, 180, 80, 0.2) 0%, transparent 70%);
+}
+
+.final-prompt {
+  position: absolute; top: 20%;
+  text-align: center; z-index: 20;
+  transition: opacity 1s;
+}
+
+.final-prompt.hidden {
+  opacity: 0; pointer-events: none;
+}
+
+.magic-text-glow {
+  font-family: 'Caveat', cursive; font-size: 3.5rem; color: #fff;
+  text-shadow: 0 0 20px #ffb450, 0 0 40px #ff6600;
+  animation: slowPulse 3s infinite alternate;
+  line-height: 1.2; margin-bottom: 30px;
+}
+
+.swipe-hint {
+  font-size: 1.2rem; opacity: 0.7;
+  animation: floatHint 2s infinite ease-in-out alternate;
+}
+
+/* Главный фонарик финала */
+.lantern-wrapper-final {
+  position: absolute; bottom: 20%;
+  display: flex; flex-direction: column; align-items: center;
+  cursor: grab; z-index: 20;
+  animation: sway 4s infinite ease-in-out alternate;
+}
+
+.lantern-wrapper-final:active { cursor: grabbing; }
+
+/* Анимация взлета главного фонарика */
+.lantern-wrapper-final.fly-away {
+  animation: finalMainFly 15s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+  pointer-events: none;
+}
+
+/* Усиленное свечение */
+.lantern.glow-intense {
+  background: rgba(255, 180, 80, 0.95);
+  box-shadow: 0 0 60px #ffb450, inset 0 0 40px #fff;
+}
+.flame.intense {
+  background: #ffcc00;
+  box-shadow: 0 0 20px #ffcc00, 0 0 40px #ff6600, 0 0 60px #fff;
+  animation: flicker 0.15s infinite alternate;
+}
+
+/* Контейнер для сотен маленьких фонариков */
+.swarm-container {
+  position: absolute; top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  overflow: hidden; pointer-events: none; z-index: 15;
+}
+
+/* Мини-фонарики (оптимизированы для производительности) */
+.mini-lantern {
+  position: absolute;
+  bottom: -50px; /* Появляются из-за нижнего края */
+  width: 15px; height: 25px;
+  background: rgba(255, 180, 80, 0.9);
+  border-radius: 8px 8px 3px 3px;
+  box-shadow: 0 0 15px #ffb450, 0 0 30px #ff6600;
+  display: flex; justify-content: center; align-items: flex-end;
+  animation: miniFlyUp linear forwards;
+}
+
+.mini-flame {
+  width: 4px; height: 4px; background: #fff;
+  border-radius: 50%; margin-bottom: 2px;
+  box-shadow: 0 0 5px #fff;
+}
+
+/* Финальный текст кульминации */
+.climax-container {
+  position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
+  text-align: center; z-index: 30; width: 100%;
+}
+
+.climax-text {
+  font-family: 'Caveat', cursive; font-size: 5rem; color: #fff;
+  text-shadow: 0 0 20px #ffb450, 0 0 40px #fff;
+  line-height: 1.1; margin-bottom: 30px;
+  animation: textReveal 3s ease-out forwards;
+  opacity: 0;
+}
+
+.climax-subtext {
+  font-family: 'Montserrat', sans-serif; font-size: 1.5rem; font-weight: 300;
+  color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5);
+  animation: textReveal 3s ease-out forwards 2s; /* Появляется чуть позже */
+  opacity: 0; margin-bottom: 50px; line-height: 1.5;
+}
+
+.restart-btn {
+  animation: textReveal 2s ease-out forwards 4s;
+  opacity: 0; background: transparent; border: 2px solid #ffb450;
+  color: #ffb450; box-shadow: 0 0 15px rgba(255, 180, 80, 0.3);
+}
+
+.restart-btn:hover {
+  background: rgba(255, 180, 80, 0.2); transform: scale(1.05);
+}
+
+/* --- Старые анимации (сжаты) --- */
+@keyframes finalMainFly { 0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; } 30% { transform: translateY(-30vh) scale(0.8) rotate(3deg); opacity: 1; } 100% { transform: translateY(-150vh) scale(0.2) rotate(-5deg); opacity: 0; } }
+@keyframes miniFlyUp { 0% { transform: translateY(0) translateX(0); opacity: 0; } 10% { opacity: 1; } 50% { transform: translateY(-60vh) translateX(10px); } 90% { opacity: 1; } 100% { transform: translateY(-120vh) translateX(-10px); opacity: 0; } }
+@keyframes slowPulse { 0% { opacity: 0.8; transform: scale(0.98); } 100% { opacity: 1; transform: scale(1.02); } }
+@keyframes floatHint { 0% { transform: translateY(0); opacity: 0.5; } 100% { transform: translateY(-10px); opacity: 0.9; } }
+@keyframes textReveal { 0% { opacity: 0; transform: translateY(20px); filter: blur(5px); } 100% { opacity: 1; transform: translateY(0); filter: blur(0); } }
+@keyframes fireworkExplosion { 0% { transform: translate(-50%, -50%) scale(1); opacity: 1; box-shadow: 0 0 20px currentColor; } 100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0); opacity: 0; } }
+@keyframes bigShake { 0%, 100% { transform: translate(0, 0) rotate(0); filter: brightness(1); } 10%, 30%, 50%, 70%, 90% { transform: translate(-15px, 15px) rotate(-2deg); filter: brightness(2) contrast(2); } 20%, 40%, 60%, 80% { transform: translate(15px, -15px) rotate(2deg); filter: invert(0.2); } }
+@keyframes furiousShake { 0% { transform: translate(-2px, 1px) rotate(0deg); } 50% { transform: translate(2px, -1px) rotate(1deg); } 100% { transform: translate(-1px, 2px) rotate(-1deg); } }
+@keyframes gentleSway { 0% { transform: rotate(-5deg); } 100% { transform: rotate(5deg); } }
+@keyframes pinataHit { 0% { transform: rotate(0deg) scale(1); } 25% { transform: rotate(-25deg) scale(0.9); } 50% { transform: rotate(25deg) scale(1.1); } 75% { transform: rotate(-15deg) scale(0.9); } 100% { transform: rotate(0deg) scale(1); } }
+@keyframes fallDown { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(120vh) rotate(720deg); opacity: 0; } }
+@keyframes dropScroll { 0% { transform: translateY(-300px) scale(0) rotate(-20deg); opacity: 0; } 60% { transform: translateY(20px) scale(1.1) rotate(10deg); opacity: 1; } 80% { transform: translateY(-10px) scale(0.95) rotate(-5deg); opacity: 1; } 100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; } }
+@keyframes flipCorrect { 0% { transform: rotateX(0); background: transparent; border-color: #555; } 50% { transform: rotateX(-90deg); background: transparent; border-color: #555; } 51% { transform: rotateX(-90deg); background: #538d4e; border-color: #538d4e; } 100% { transform: rotateX(0); background: #538d4e; border-color: #538d4e; } }
+@keyframes flipPresent { 0% { transform: rotateX(0); background: transparent; border-color: #555; } 50% { transform: rotateX(-90deg); background: transparent; border-color: #555; } 51% { transform: rotateX(-90deg); background: #b59f3b; border-color: #b59f3b; } 100% { transform: rotateX(0); background: #b59f3b; border-color: #b59f3b; } }
+@keyframes flipAbsent { 0% { transform: rotateX(0); background: transparent; border-color: #555; } 50% { transform: rotateX(-90deg); background: transparent; border-color: #555; } 51% { transform: rotateX(-90deg); background: #3a3a3c; border-color: #3a3a3c; } 100% { transform: rotateX(0); background: #3a3a3c; border-color: #3a3a3c; } }
+@keyframes fullStarBurst { 0% { transform: translate(-50%, -50%) translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) translate(var(--translateX), var(--translateY)) scale(0); opacity: 0; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeInText { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes twinkle { from { opacity: 0.3; } to { opacity: 1; } }
+@keyframes floatUp { 0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translateY(-120vh) scale(0.6) rotate(5deg); opacity: 0; } }
+@keyframes flicker { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.1); opacity: 1; } }
