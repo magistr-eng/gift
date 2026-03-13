@@ -3,21 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Особенное поздравление</title>
-    <link rel="stylesheet" href="style.css">
+    <title>С годовщиной, любимая!</title>
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #d4af37;
+            --deep-red: #800020;
+            --soft-pink: #fff0f3;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Montserrat', sans-serif;
+            background-color: #1a1a1a;
+        }
+
+        #root {
+            height: 100%;
+        }
+
+        .wrapper {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 1.5s ease;
+            perspective: 1000px;
+            position: relative;
+        }
+
+        .active-bg {
+            background: radial-gradient(circle, #4a0e0e 0%, #1a1a1a 100%);
+        }
+
+        /* Анимированные сердечки на фоне */
+        .floating-heart {
+            position: absolute;
+            bottom: -50px;
+            pointer-events: none;
+            opacity: 0;
+            animation: moveUp linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes moveUp {
+            0% { transform: translateY(0) rotate(0); opacity: 0; }
+            20% { opacity: 0.6; }
+            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Карточка */
+        .card {
+            width: 340px;
+            height: 480px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid var(--gold);
+            box-sizing: border-box;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        .front {
+            background: #262626;
+            color: white;
+        }
+
+        .back {
+            background: white;
+            color: #333;
+            transform: rotateY(180deg);
+        }
+
+        h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.5rem;
+            color: var(--deep-red);
+            margin: 0;
+        }
+
+        h2 {
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+        }
+
+        .date {
+            margin-top: 20px;
+            color: var(--gold);
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .hint {
+            margin-top: 30px;
+            font-size: 0.7rem;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 8px 15px;
+            border-radius: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        p {
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+    </style>
 </head>
 <body>
+    <div id="root"></div>
 
-    <div class="container">
-        <div id="main-gift">🎁</div>
-        
-        <div id="message" class="hidden">
-            <h1>Для самой прекрасной! ❤️</h1>
-            <p>Ты делаешь этот мир ярче просто тем, что ты в нем есть. Пусть каждый твой день будет похож на праздник!</p>
-            <p class="signature">С любовью, [Твое Имя]</p>
-        </div>
-    </div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-    <script src="script.js"></script>
+        function AnniversaryApp() {
+            const [isFlipped, setIsFlipped] = useState(false);
+            const [hearts, setHearts] = useState([]);
+
+            // Создаем массив данных для сердечек один раз
+            useEffect(() => {
+                const heartData = Array.from({ length: 25 }).map((_, i) => ({
+                    id: i,
+                    left: Math.random() * 100 + '%',
+                    size: Math.random() * 20 + 10 + 'px',
+                    delay: Math.random() * 5 + 's',
+                    duration: Math.random() * 3 + 4 + 's'
+                }));
+                setHearts(heartData);
+            }, []);
+
+            return (
+                <div className={`wrapper ${isFlipped ? 'active-bg' : ''}`}>
+                    {/* Фон из сердечек */}
+                    {hearts.map(h => (
+                        <span 
+                            key={h.id} 
+                            className="floating-heart" 
+                            style={{ 
+                                left: h.left, 
+                                fontSize: h.size, 
+                                animationDelay: h.delay, 
+                                animationDuration: h.duration 
+                            }}
+                        >
+                            ❤️
+                        </span>
+                    ))}
+
+                    {/* Интерактивная карточка */}
+                    <div className="card" onClick={() => setIsFlipped(!isFlipped)}>
+                        <div className={`card-inner ${isFlipped ? 'is-flipped' : ''}`}>
+                            
+                            {/* Лицевая сторона */}
+                            <div className="front">
+                                <h2>Для моей</h2>
+                                <h1>Любимой</h1>
+                                <div className="hint">Нажми, чтобы открыть</div>
+                            </div>
+
+                            {/* Обратная сторона */}
+                            <div className="back">
+                                <h1>С годовщиной!</h1>
+                                <p>Ты — самая лучшая жена, мой лучший друг и моя самая большая любовь.</p>
+                                <p>Спасибо за то, что каждый мой день ты превращаешь в сказку.</p>
+                                <div className="date">10 МАРТА 2026</div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Рендерим приложение в div с id="root"
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<AnniversaryApp />);
+    </script>
 </body>
 </html>
